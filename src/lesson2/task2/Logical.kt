@@ -4,8 +4,6 @@ package lesson2.task2
 
 import lesson1.task1.sqr
 import lesson1.task1.trackLength
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * Пример
@@ -89,6 +87,4 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean =
-    a * b <= r * s && max(a, b) / min(a, b) <= max(r, s) / min(r, s) ||
-            b * c <= r * s && max(b, c) / min(b, c) <= max(r, s) / min(r, s) ||
-            a * c <= r * s && max(a, c) / min(a, c) <= max(r, s) / min(r, s)
+    a * b <= r * s || b * c <= r * s || a * c <= r * s
