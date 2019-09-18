@@ -36,8 +36,8 @@ fun isNumberHappy(number: Int): Boolean {
  * Считать, что ферзи не могут загораживать друг друга.
  */
 fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
-    val threatVertical = x1 == x2
-    val threatHorizontal = y1 == y2
+    val threatHorizontal = x1 == x2
+    val threatVertical = y1 == y2
     val threatDiagonal = sqr(x1 - x2) == sqr(y1 - y2)
 
     return threatVertical || threatHorizontal || threatDiagonal
@@ -55,11 +55,12 @@ fun daysInMonth(month: Int, year: Int): Int {
 
     val even = month % 2 == 0
 
-    if (month in 1..7) {
-        if (month == 2) return if (leapYear) 29 else 28
-        return if (even) 30 else 31
+    return if (month in 1..7) {
+        if (month == 2)
+            if (leapYear) 29 else 28
+        else if (even) 30 else 31
     } else
-        return if (even) 31 else 30
+        if (even) 31 else 30
 }
 
 /**
