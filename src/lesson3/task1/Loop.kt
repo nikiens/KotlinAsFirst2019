@@ -292,7 +292,8 @@ fun revert(n: Int): Int {
  */
 fun isPalindrome(n: Int): Boolean {
     val decimalPlace = digitNumber(n) - 1
-    return n / 10 == revert(n % 10.0.pow(decimalPlace).toInt())
+    val withoutFirst = n % 10.0.pow(decimalPlace).toInt()
+    return n / 10 == revert(withoutFirst) * 10.0.pow(decimalPlace - digitNumber(withoutFirst)).toInt()
 }
 
 /**
