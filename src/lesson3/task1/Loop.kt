@@ -2,7 +2,8 @@
 
 package lesson3.task1
 
-import kotlin.math.sqrt
+import lesson1.task1.sqr
+import kotlin.math.*
 
 /**
  * Пример
@@ -12,7 +13,7 @@ import kotlin.math.sqrt
 fun factorial(n: Int): Double {
     var result = 1.0
     for (i in 1..n) {
-        result = result * i // Please do not fix in master
+        result *= i
     }
     return result
 }
@@ -60,6 +61,58 @@ fun digitCountInNumber(n: Int, m: Int): Int =
     }
 
 /**
+ * Вспомогательные функции
+ */
+fun getDivisors(n: Int): Set<Int> {
+    val divs = mutableSetOf(1, n)
+
+    for (i in 2..sqrt(n.toDouble()).toInt())
+        if (n % i == 0) {
+            divs.add(i)
+            if (i != n / i) divs.add(n / i)
+        }
+
+    return divs
+}
+
+fun getCommon(m: Int, n: Int): Set<Int> =
+    getDivisors(m) intersect getDivisors(n)
+
+fun taylor(
+    x: Double,
+    eps: Double,
+    fstElem: Double,
+    nInitial: Int
+): Double {
+    var elem = fstElem
+    var sum = elem
+    var n = nInitial
+
+    while (abs(elem) > eps) {
+        elem *= -sqr(x % (2 * PI)) / (n * (n + 1))
+        sum += elem
+        n += 2
+    }
+    return sum
+}
+
+fun getSequenceDigit(
+    n: Int,
+    func: (i: Int) -> Int
+): Int {
+    var number = 1
+    var count = 0
+    var result = 0
+
+    while (count < n) {
+        result = func(number++)
+        count += digitNumber(result)
+    }
+
+    return (result / 10.0.pow(count - n).toInt()) % 10
+}
+
+/**
  * Простая
  *
  * Найти количество цифр в заданном числе n.
@@ -67,7 +120,17 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    var number = n
+    var count = 0
+
+    do {
+        count++
+        number /= 10
+    } while (number > 0)
+
+    return count
+}
 
 /**
  * Простая
@@ -75,7 +138,17 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int {
+    val fib = mutableListOf(0, 1)
+
+    for (i in 2..n) {
+        fib[0] += fib[1]
+        fib.sort()
+    }
+
+    return fib[1]
+}
+
 
 /**
  * Простая
@@ -83,21 +156,29 @@ fun fib(n: Int): Int = TODO()
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun lcm(m: Int, n: Int): Int = TODO()
+fun lcm(m: Int, n: Int): Int {
+    val gcd = getCommon(m, n).max()!!
+
+    return m * n / gcd
+}
 
 /**
  * Простая
  *
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
-fun minDivisor(n: Int): Int = TODO()
+fun minDivisor(n: Int): Int =
+    getDivisors(n).filter { it > 1 }.min()!!
+
 
 /**
  * Простая
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int = TODO()
+fun maxDivisor(n: Int): Int =
+    getDivisors(n).filter { it < n }.max()!!
+
 
 /**
  * Простая
@@ -106,7 +187,8 @@ fun maxDivisor(n: Int): Int = TODO()
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int): Boolean = TODO()
+fun isCoPrime(m: Int, n: Int): Boolean =
+    getCommon(m, n).none { it != 1 }
 
 /**
  * Простая
@@ -115,7 +197,14 @@ fun isCoPrime(m: Int, n: Int): Boolean = TODO()
  * то есть, существует ли такое целое k, что m <= k*k <= n.
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
-fun squareBetweenExists(m: Int, n: Int): Boolean = TODO()
+fun squareBetweenExists(m: Int, n: Int): Boolean {
+    val last = ceil(sqrt(n.toDouble())).toInt()
+    val penultimate = sqr(last) - 2 * (last - 1) - 1
+
+    return sqrt(n.toDouble()) % 1 == 0.0 ||
+            sqrt(m.toDouble()) % 1 == 0.0 ||
+            penultimate in m..n
+}
 
 /**
  * Средняя
@@ -133,7 +222,17 @@ fun squareBetweenExists(m: Int, n: Int): Boolean = TODO()
  * Написать функцию, которая находит, сколько шагов требуется для
  * этого для какого-либо начального X > 0.
  */
-fun collatzSteps(x: Int): Int = TODO()
+fun collatzSteps(x: Int): Int {
+    var elem = x
+    var count = 0
+
+    while (elem != 1) {
+        if (elem % 2 == 0) elem /= 2 else elem = 3 * elem + 1
+        count++
+    }
+
+    return count
+}
 
 /**
  * Средняя
@@ -144,7 +243,9 @@ fun collatzSteps(x: Int): Int = TODO()
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
-fun sin(x: Double, eps: Double): Double = TODO()
+fun sin(x: Double, eps: Double): Double =
+    taylor(x, eps, x % (2 * PI), 2)
+
 
 /**
  * Средняя
@@ -155,7 +256,8 @@ fun sin(x: Double, eps: Double): Double = TODO()
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
-fun cos(x: Double, eps: Double): Double = TODO()
+fun cos(x: Double, eps: Double): Double =
+    taylor(x, eps, 1.0, 1)
 
 /**
  * Средняя
@@ -164,7 +266,20 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun revert(n: Int): Int = TODO()
+fun revert(n: Int): Int {
+    var decimalPlace = digitNumber(n) - 1
+    var number = n
+    var result = 0.0
+
+    while (number > 0) {
+        val digit = number % 10
+
+        result += digit * 10.0.pow(decimalPlace--)
+        number /= 10
+    }
+
+    return result.toInt()
+}
 
 /**
  * Средняя
@@ -175,7 +290,7 @@ fun revert(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = TODO()
+fun isPalindrome(n: Int): Boolean = n == revert(n)
 
 /**
  * Средняя
@@ -185,18 +300,25 @@ fun isPalindrome(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun hasDifferentDigits(n: Int): Boolean = TODO()
+fun hasDifferentDigits(n: Int): Boolean {
+    val decimalPlace = digitNumber(n) - 1
+    val a = n / 10
+    val b = n % 10.0.pow(decimalPlace).toInt()
+
+    return a != b
+}
 
 /**
  * Сложная
  *
  * Найти n-ю цифру последовательности из квадратов целых чисел:
- * 149162536496481100121144...
+ * 14916253649 64 81 100 121 144...
  * Например, 2-я цифра равна 4, 7-я 5, 12-я 6.
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int =
+    getSequenceDigit(n) { n -> sqr(n) }
 
 /**
  * Сложная
@@ -207,4 +329,5 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int =
+    getSequenceDigit(n) { n -> fib(n) }
