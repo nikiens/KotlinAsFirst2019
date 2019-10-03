@@ -290,7 +290,10 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = n == revert(n)
+fun isPalindrome(n: Int): Boolean {
+    val decimalPlace = digitNumber(n) - 1
+    return n / 10 == revert(n % 10.0.pow(decimalPlace).toInt())
+}
 
 /**
  * Средняя
@@ -302,10 +305,7 @@ fun isPalindrome(n: Int): Boolean = n == revert(n)
  */
 fun hasDifferentDigits(n: Int): Boolean {
     val decimalPlace = digitNumber(n) - 1
-    val a = n / 10
-    val b = n % 10.0.pow(decimalPlace).toInt()
-
-    return a != b
+    return n / 10 != n % 10.0.pow(decimalPlace).toInt()
 }
 
 /**
