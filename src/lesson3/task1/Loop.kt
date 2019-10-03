@@ -127,7 +127,7 @@ fun digitNumber(n: Int): Int {
     do {
         count++
         number /= 10
-    } while (number > 0)
+    } while (number != 0)
 
     return count
 }
@@ -271,7 +271,7 @@ fun revert(n: Int): Int {
     var number = n
     var result = 0.0
 
-    while (number > 0) {
+    while (number != 0) {
         val digit = number % 10
 
         result += digit * 10.0.pow(decimalPlace--)
