@@ -89,7 +89,7 @@ fun taylor(
     var n = nInitial
 
     while (abs(elem) > eps) {
-        elem *= -sqr(x % (2 * PI)) / (n * (n + 1))
+        elem *= -sqr(x) / (n * (n + 1))
         sum += elem
         n += 2
     }
@@ -177,8 +177,7 @@ fun minDivisor(n: Int): Int =
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int =
-    getDivisors(n).filter { it < n }.max()!!
-
+    n / minDivisor(n)
 
 /**
  * Простая
@@ -244,7 +243,7 @@ fun collatzSteps(x: Int): Int {
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double =
-    taylor(x, eps, x % (2 * PI), 2)
+    taylor(x % (2 * PI), eps, x % (2 * PI), 2)
 
 
 /**
@@ -257,7 +256,7 @@ fun sin(x: Double, eps: Double): Double =
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double =
-    taylor(x, eps, 1.0, 1)
+    taylor(x % (2 * PI), eps, 1.0, 1)
 
 /**
  * Средняя
