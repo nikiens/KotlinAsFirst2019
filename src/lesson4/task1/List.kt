@@ -240,9 +240,104 @@ fun roman(n: Int): String = TODO()
 
 /**
  * Очень сложная
- *
+
  * Записать заданное натуральное число 1..999999 прописью по-русски.
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+val dict = listOf(
+    listOf(
+        "",
+        "сто",
+        "двести",
+        "триста",
+        "четыреста",
+        "пятьсот",
+        "шестьсот",
+        "семьсот",
+        "восемьсот",
+        "девятьсот"
+    ),
+    listOf(
+        "",
+        "десять",
+        "двадцать",
+        "тридцать",
+        "сорок",
+        "пятьдесят",
+        "шестьдесят",
+        "семьдесят",
+        "восемьдесят",
+        "девяносто"
+    ),
+    listOf(
+        "",
+        "один",
+        "два",
+        "три",
+        "четыре",
+        "пять",
+        "шесть",
+        "семь",
+        "восемь",
+        "девять"
+    ),
+
+    listOf(
+        "",
+        "одиннадцать",
+        "двенадцать",
+        "тринадцать",
+        "четырнадцать",
+        "пятнадцать",
+        "шестнадцать",
+        "семьнадцать",
+        "восемьнадцать",
+        "девятнадцать"
+    )
+)
+
+fun thousandToRussian(triad: String): String {
+    val digits = triad.split(" ").toMutableList()
+
+    digits[digits.lastIndex] = when (digits[digits.lastIndex]) {
+        dict[2][1] -> "одна тысяча"
+        dict[2][2] -> "две тысячи"
+        in dict[2][3]..dict[2][4] -> digits[digits.lastIndex] + " тысячи"
+        else -> digits[digits.lastIndex] + " тысяч"
+    }
+
+    return digits.joinToString(" ")
+}
+
+fun triadToRussian(triad: String): String {
+    val result = StringBuilder()
+
+    triad.forEachIndexed { idx, c ->
+        result.append(dict[idx][c.toString().toInt()])
+        if (dict[idx][c.toString().toInt()] != "")
+            result.append(" ")
+    }
+
+    if (triad[1] == '1' && triad[2] != '0')
+        result.run {
+            replace(
+                this.indexOf("десять"),
+                this.lastIndexOf(""),
+
+                dict[3][triad.last().toString().toInt()]
+            )
+        }
+    return result.toString().trim()
+}
+
+fun russian(n: Int): String {
+    val fstTriad = "%03d".format(n / 1000)
+    val sndTriad = "%03d".format(n % 1000)
+
+    return if (n >= 1000) {
+        if (triadToRussian(sndTriad).isNotEmpty())
+            thousandToRussian(triadToRussian(fstTriad)) + " " + triadToRussian(sndTriad)
+        else thousandToRussian(triadToRussian(fstTriad))
+    } else triadToRussian(sndTriad)
+}
