@@ -252,10 +252,9 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
 
     val result = stuff
         .filterValues { it.first == kind && it.second == minimum }
-        .keys
-        .joinToString("")
+        .keys.firstOrNull()
 
-    return if (result.isEmpty() && (!stuff.containsKey("") || minimum == null))
+    return if (result.isNullOrEmpty() && !stuff.containsKey(""))
         null else result
 }
 
@@ -399,6 +398,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
 
     val values = treasures.values
     val keys = treasures.keys
+    val weights = values.map { it.second }.asReversed() + 0
 
     for (i in 1 until treasures.size + 1) {
         for (j in 1 until capacity + 1)
@@ -414,7 +414,9 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     }
 
     for (i in treasures.size downTo 1)
-        if (table[i][capacity] != table[i - 1][capacity])
+        if (table[i][capacity] != table[i - 1][capacity] &&
+            weights[i] <= weights[i - 1]
+        )
             result.add(keys.elementAt(i - 1))
 
     return result
