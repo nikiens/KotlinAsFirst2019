@@ -407,10 +407,11 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                         values.elementAt(i - 1).second +
                                 table[i - 1][j - values.elementAt(i - 1).first]
                     )
-
-        if (table[i - 1][capacity] != table[i][capacity])
-            result.add(keys.elementAt(i - 1))
     }
+
+    for (i in treasures.size downTo 1)
+        if (table[i][capacity] != table[i - 1][capacity])
+            result.add(keys.elementAt(i - 1))
 
     return result
 }
