@@ -3,7 +3,12 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import lesson1.task1.sqr
+import lesson3.task1.minDivisor
+import ru.spbstu.ktuples.zip
+import kotlin.math.pow
 import kotlin.math.sqrt
+
 
 /**
  * Пример
@@ -115,14 +120,22 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = TODO()
+fun abs(v: List<Double>): Double {
+    var sum = 0.0
+
+    if (v.isNotEmpty())
+        v.forEach { sum += sqr(it) }
+
+    return sqrt(sum)
+}
 
 /**
  * Простая
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double = TODO()
+fun mean(list: List<Double>): Double =
+    if (list.isEmpty()) 0.0 else list.average()
 
 /**
  * Средняя
@@ -132,7 +145,16 @@ fun mean(list: List<Double>): Double = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun center(list: MutableList<Double>): MutableList<Double> = TODO()
+fun center(list: MutableList<Double>): MutableList<Double> {
+    val av = list.average()
+
+    if (list.isNotEmpty())
+        list.forEachIndexed { idx, _ ->
+            list[idx] -= av
+        }
+
+    return list
+}
 
 /**
  * Средняя
@@ -141,7 +163,12 @@ fun center(list: MutableList<Double>): MutableList<Double> = TODO()
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int = TODO()
+fun times(a: List<Int>, b: List<Int>): Int {
+    var sum = 0
+    zip(a, b).forEach { (x, y) -> sum += x * y }
+
+    return sum
+}
 
 /**
  * Средняя
@@ -151,7 +178,16 @@ fun times(a: List<Int>, b: List<Int>): Int = TODO()
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0 при любом x.
  */
-fun polynom(p: List<Int>, x: Int): Int = TODO()
+fun polynom(p: List<Int>, x: Int): Int {
+    var sum = 0.0
+
+    p.forEachIndexed { idx, e ->
+        var idx = idx
+        sum += e * x.toDouble().pow(idx++)
+    }
+
+    return sum.toInt()
+}
 
 /**
  * Средняя
@@ -163,7 +199,13 @@ fun polynom(p: List<Int>, x: Int): Int = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
+fun accumulate(list: MutableList<Int>): MutableList<Int> {
+    for (idx in 1..list.lastIndex)
+        list[idx] += list[idx - 1]
+
+    return list
+}
+
 
 /**
  * Средняя
@@ -172,7 +214,17 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
-fun factorize(n: Int): List<Int> = TODO()
+fun factorize(n: Int): List<Int> {
+    val result = mutableListOf(minDivisor(n))
+    var number = n / minDivisor(n)
+
+    while (number != 1) {
+        result += minDivisor(number)
+        number /= minDivisor(number)
+    }
+
+    return result
+}
 
 /**
  * Сложная
@@ -181,7 +233,8 @@ fun factorize(n: Int): List<Int> = TODO()
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = TODO()
+fun factorizeToString(n: Int): String =
+    factorize(n).joinToString("*")
 
 /**
  * Средняя
@@ -190,7 +243,17 @@ fun factorizeToString(n: Int): String = TODO()
  * Результат перевода вернуть в виде списка цифр в base-ичной системе от старшей к младшей,
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
-fun convert(n: Int, base: Int): List<Int> = TODO()
+fun convert(n: Int, base: Int): List<Int> {
+    val result = mutableListOf(n % base)
+    var number = n / base
+
+    while (number != 0) {
+        result += number % base
+        number /= base
+    }
+
+    return result.asReversed()
+}
 
 /**
  * Сложная
@@ -203,7 +266,13 @@ fun convert(n: Int, base: Int): List<Int> = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, n.toString(base) и подобные), запрещается.
  */
-fun convertToString(n: Int, base: Int): String = TODO()
+fun convertToString(n: Int, base: Int): String {
+    val dict = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+    return convert(n, base)
+        .map { dict[it] }
+        .joinToString("")
+}
 
 /**
  * Средняя
@@ -212,7 +281,15 @@ fun convertToString(n: Int, base: Int): String = TODO()
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int = TODO()
+fun decimal(digits: List<Int>, base: Int): Int {
+    val digits = digits.asReversed()
+    var sum = 0.0
+    var exp = 0
+
+    digits.forEach { sum += it * base.toDouble().pow(exp++) }
+
+    return sum.toInt()
+}
 
 /**
  * Сложная
@@ -226,7 +303,15 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, str.toInt(base)), запрещается.
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int {
+    val dict = "0123456789abcdefghijklmnopqrstuvwxyz"
+    val digits = mutableListOf<Int>()
+
+    str.forEach { digits += dict.indexOf(it) }
+
+    return decimal(digits, base)
+}
+
 
 /**
  * Сложная
@@ -297,19 +382,6 @@ val dict = listOf(
     )
 )
 
-fun thousandToRussian(triad: String): String {
-    val digits = triad.split(" ").toMutableList()
-
-    digits[digits.lastIndex] = when (digits[digits.lastIndex]) {
-        dict[2][1] -> "одна тысяча"
-        dict[2][2] -> "две тысячи"
-        in dict[2][3]..dict[2][4] -> digits[digits.lastIndex] + " тысячи"
-        else -> digits[digits.lastIndex] + " тысяч"
-    }
-
-    return digits.joinToString(" ")
-}
-
 fun triadToRussian(triad: String): String {
     val result = StringBuilder()
 
@@ -329,6 +401,19 @@ fun triadToRussian(triad: String): String {
             )
         }
     return result.toString().trim()
+}
+
+fun thousandToRussian(triad: String): String {
+    val digits = triad.split(" ").toMutableList()
+
+    digits[digits.lastIndex] = when (digits[digits.lastIndex]) {
+        dict[2][1] -> "одна тысяча"
+        dict[2][2] -> "две тысячи"
+        in dict[2][3]..dict[2][4] -> digits[digits.lastIndex] + " тысячи"
+        else -> digits[digits.lastIndex] + " тысяч"
+    }
+
+    return digits.joinToString(" ")
 }
 
 fun russian(n: Int): String {
