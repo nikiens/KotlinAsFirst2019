@@ -409,7 +409,8 @@ fun thousandToRussian(triad: String): String {
     digits[digits.lastIndex] = when (digits[digits.lastIndex]) {
         dict[2][1] -> "одна тысяча"
         dict[2][2] -> "две тысячи"
-        in dict[2][3]..dict[2][4] -> digits[digits.lastIndex] + " тысячи"
+        dict[2][3] -> digits[digits.lastIndex] + " тысячи"
+        dict[2][4] -> digits[digits.lastIndex] + " тысячи"
         else -> digits[digits.lastIndex] + " тысяч"
     }
 

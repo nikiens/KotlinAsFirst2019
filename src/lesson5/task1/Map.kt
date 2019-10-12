@@ -255,7 +255,8 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
         .keys
         .joinToString("")
 
-    return if (result.isEmpty()) null else result
+    return if (result.isEmpty() && !stuff.containsKey(""))
+        null else result
 }
 
 /**
@@ -268,9 +269,12 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    word.forEach {
-        if (it !in chars) return false
-    }
+    val chars = chars.map { it.toLowerCase() }
+
+    word.toLowerCase()
+        .forEach {
+            if (it !in chars) return false
+        }
 
     return true
 }
@@ -306,6 +310,8 @@ fun hasAnagrams(words: List<String>): Boolean {
     val words = words.map { e -> e to words.filter { it != e } }.toMap()
 
     words.forEach { (k, v) ->
+        if (v.isEmpty()) return true
+
         val word = k.toCharArray().toList()
 
         v.forEach {
