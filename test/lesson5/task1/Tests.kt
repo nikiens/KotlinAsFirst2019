@@ -227,6 +227,13 @@ class Tests {
                 "печенье"
             )
         )
+        assertNull(
+            findCheapestStuff(mapOf("" to ("" to 0.0)), "a")
+        )
+        assertEquals(
+            "",
+            findCheapestStuff(mapOf("" to ("" to 2.0)), "")
+        )
     }
 
     @Test
@@ -236,7 +243,7 @@ class Tests {
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
         assertTrue(canBuildFrom(listOf('a', 'a', 'a', 'm', 'a', 'a'), "M"))
-        assertTrue(lesson5.task1.canBuildFrom(listOf('M'),"m"))
+        assertTrue(canBuildFrom(listOf('M'), "m"))
     }
 
     @Test
@@ -263,6 +270,7 @@ class Tests {
         assertTrue(hasAnagrams(listOf("рот", "свет", "тор")))
         assertFalse(hasAnagrams(listOf("рот", "свет", "код", "дверь")))
         assertTrue(hasAnagrams(listOf("", "")))
+        assertTrue(hasAnagrams(listOf("a", "v", "a")))
     }
 
     @Test

@@ -255,7 +255,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
         .keys
         .joinToString("")
 
-    return if (result.isEmpty() && !stuff.containsKey(""))
+    return if (result.isEmpty() && (!stuff.containsKey("") || minimum == null))
         null else result
 }
 
@@ -307,11 +307,9 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val words = words.map { e -> e to words.filter { it != e } }.toMap()
+    val words = words.map { e -> e to words.toList() - e }.toMap()
 
     words.forEach { (k, v) ->
-        if (v.isEmpty()) return true
-
         val word = k.toCharArray().toList()
 
         v.forEach {
