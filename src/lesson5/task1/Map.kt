@@ -306,9 +306,9 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val words = words.map { e -> e to words.toList() - e }.toMap()
+    val wrds = words.map { e -> e to words.toList() - e }.toMap()
 
-    words.forEach { (k, v) ->
+    wrds.forEach { (k, v) ->
         val word = k.toCharArray().toList()
 
         v.forEach {
@@ -390,34 +390,44 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  * Использованные материалы:
  * https://www.gatevidyalay.com/0-1-knapsack-problem-using-dynamic-programming-approach
  * https://www.gatevidyalay.com/wp-content/uploads/2018/03/0-1-Knapsack-Problem.pdf
+ * http://www.es.ele.tue.nl/education/5MC10/Solutions/knapsack.pdf (Идея использования
+ * вспомогательного булевого 2D списка для отыскания предметов, ибо перебор последнего столбца
+ * не дает нужного результата при частных случаях, и для каждого нового приходилось
+ * городить костыли)
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     val result = mutableSetOf<String>()
+
     val table =
         MutableList(treasures.size + 1) { MutableList(capacity + 1) { 0 } }
+    val keep =
+        MutableList(treasures.size + 1) { MutableList(capacity + 1) { false } }
+
 
     val values = treasures.values
     val keys = treasures.keys
-    val weights = values.map { it.second }.asReversed() + 0
+    var cap = capacity
 
     for (i in 1 until treasures.size + 1) {
         for (j in 1 until capacity + 1)
-            table[i][j] =
-                if (j - values.elementAt(i - 1).first < 0)
-                    table[i - 1][j]
-                else
-                    max(
-                        table[i - 1][j],
-                        values.elementAt(i - 1).second +
-                                table[i - 1][j - values.elementAt(i - 1).first]
-                    )
+            table[i][j] = if (j - values.elementAt(i - 1).first < 0)
+                table[i - 1][j]
+            else {
+                keep[i][j] = true
+
+                max(
+                    table[i - 1][j],
+                    values.elementAt(i - 1).second +
+                            table[i - 1][j - values.elementAt(i - 1).first]
+                )
+            }
     }
 
-    for (i in treasures.size downTo 1)
-        if (table[i][capacity] != table[i - 1][capacity] &&
-            weights[i] <= weights[i - 1]
-        )
+    for (i in treasures.size - 1 downTo 1)
+        if (keep[i][cap]) {
             result.add(keys.elementAt(i - 1))
+            cap -= values.elementAt(i - 1).first
+        }
 
     return result
 }
