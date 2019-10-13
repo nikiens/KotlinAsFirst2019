@@ -248,10 +248,10 @@ fun convert(n: Int, base: Int): List<Int> {
     val result = mutableListOf<Int>()
     var number = n
 
-    while (number != 0) {
+    do {
         result += number % base
         number /= base
-    }
+    } while (number != 0)
 
     return result.asReversed()
 }
