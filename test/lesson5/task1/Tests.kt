@@ -167,6 +167,7 @@ class Tests {
                 mapOf("Emergency" to "112")
             )
         )
+
         assertEquals(
             mapOf("Emergency" to "112", "Police" to "02"),
             mergePhoneBooks(

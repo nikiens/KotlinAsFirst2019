@@ -170,38 +170,9 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
  *     mapOf("Emergency" to "911", "Police" to "02")
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
-fun mergeValues(
-    mapA: Map<String, String>,
-    mapB: Map<String, String>
-): String {
-    val result = StringBuilder()
-
-    mapA.forEach { (k, v) ->
-        if (k in mapB.keys)
-            result
-                .append(v)
-                .append(", ")
-                .append(mapB[k])
-    }
-
-    return result.toString()
-}
-
-fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
-    val result = mutableMapOf<String, String>()
-
-    result.run {
-        putAll(mapA)
-        putAll(mapB)
-    }
-
-    mapA.forEach { (k, v) ->
-        if (k in mapB.keys && v !in mapB.values)
-            result[k] = mergeValues(mapA, mapB)
-    }
-
-    return result
-}
+fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> =
+    (mapA.toList() + mapB.toList()).groupBy({ it.first }, { it.second })
+        .map { it.key to it.value.toSet().joinToString(", ") }.toMap()
 
 /**
  * Средняя
@@ -213,20 +184,8 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *   averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
-fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
-    val result = mutableMapOf<String, Double>()
-
-    stockPrices.forEach { (first) ->
-        val average = stockPrices
-            .filter { it.first == first }
-            .map { it.second }
-            .average()
-
-        result[first] = average
-    }
-
-    return result
-}
+fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> =
+    stockPrices.groupBy({ it.first }, { it.second }).map { it.key to it.value.average() }.toMap()
 
 /**
  * Средняя
@@ -243,20 +202,8 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *     "печенье"
  *   ) -> "Мария"
  */
-fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    val minimum = stuff
-        .filterValues { it.first == kind }
-        .values
-        .map { it.second }
-        .min()
-
-    val result = stuff
-        .filterValues { it.first == kind && it.second == minimum }
-        .keys.firstOrNull()
-
-    return if (result.isNullOrEmpty() && !stuff.containsKey(""))
-        null else result
-}
+fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? =
+    stuff.filterValues { it.first == kind }.minBy { it.value.second }?.key
 
 /**
  * Средняя
@@ -267,16 +214,8 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    val chars = chars.map { it.toLowerCase() }
-
-    word.toLowerCase()
-        .forEach {
-            if (it !in chars) return false
-        }
-
-    return true
-}
+fun canBuildFrom(chars: List<Char>, word: String): Boolean =
+    chars.map { it.toLowerCase() }.containsAll(word.map { it.toLowerCase() })
 
 /**
  * Средняя
@@ -291,10 +230,7 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
 fun extractRepeats(list: List<String>): Map<String, Int> =
-    list
-        .groupingBy { it }
-        .eachCount()
-        .filterValues { it > 1 }
+    list.groupingBy { it }.eachCount().filterValues { it > 1 }
 
 /**
  * Средняя
@@ -306,19 +242,15 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val wrds = words.map { e -> e to words.toList() - e }.toMap()
+    val words = words.map { e -> e.toSet() to words - e }.toSet().toMap()
 
-    wrds.forEach { (k, v) ->
-        val word = k.toCharArray().toList()
-
+    words.forEach { (k, v) ->
         v.forEach {
-            if (canBuildFrom(word, it)) return true
+            if (canBuildFrom(k.toList(), it)) return true
         }
     }
-
     return false
 }
-
 /**
  * Сложная
  *
@@ -403,8 +335,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     var cap = capacity
     var last = treasures.size
 
-    for (i in 1 until treasures.size + 1) {
-        for (j in 1 until capacity + 1)
+    for (i in 1 until last + 1) {
+        for (j in 1 until cap + 1)
             table[i][j] = if (j - values.elementAt(i - 1).first < 0)
                 table[i - 1][j]
             else
