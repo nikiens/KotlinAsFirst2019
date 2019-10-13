@@ -123,8 +123,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
 fun abs(v: List<Double>): Double {
     var sum = 0.0
 
-    if (v.isNotEmpty())
-        v.forEach { sum += sqr(it) }
+    v.forEach { sum += sqr(it) }
 
     return sqrt(sum)
 }
@@ -148,10 +147,9 @@ fun mean(list: List<Double>): Double =
 fun center(list: MutableList<Double>): MutableList<Double> {
     val av = list.average()
 
-    if (list.isNotEmpty())
-        list.forEachIndexed { idx, _ ->
-            list[idx] -= av
-        }
+    list.forEachIndexed { idx, _ ->
+        list[idx] -= av
+    }
 
     return list
 }
@@ -163,12 +161,9 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int {
-    var sum = 0
-    zip(a, b).forEach { (x, y) -> sum += x * y }
+fun times(a: List<Int>, b: List<Int>): Int =
+    a.mapIndexed { idx, e -> e * b[idx] }.sum()
 
-    return sum
-}
 
 /**
  * Средняя
@@ -179,10 +174,12 @@ fun times(a: List<Int>, b: List<Int>): Int {
  * Значение пустого многочлена равно 0 при любом x.
  */
 fun polynom(p: List<Int>, x: Int): Int {
+    var expX = 1
     var sum = 0
 
-    p.forEachIndexed { idx, e ->
-        sum += e * x.toDouble().pow(idx).toInt()
+    p.forEach {
+        sum += it * expX
+        expX *= x
     }
 
     return sum
@@ -214,13 +211,18 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    val result = mutableListOf(minDivisor(n))
-    var number = n / minDivisor(n)
+    val result = mutableListOf<Int>()
+    var number = n
+    var factor = 2
 
-    while (number != 1) {
-        result += minDivisor(number)
-        number /= minDivisor(number)
-    }
+    while (factor <= sqrt(number.toDouble()))
+        if (number % factor == 0) {
+            result += factor
+            number /= factor
+        } else
+            factor += 1
+
+    result += number
 
     return result
 }
@@ -243,8 +245,8 @@ fun factorizeToString(n: Int): String =
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    val result = mutableListOf(n % base)
-    var number = n / base
+    val result = mutableListOf<Int>()
+    var number = n
 
     while (number != 0) {
         result += number % base
@@ -282,12 +284,15 @@ fun convertToString(n: Int, base: Int): String {
  */
 fun decimal(digits: List<Int>, base: Int): Int {
     val digits = digits.asReversed()
-    var sum = 0.0
-    var exp = 0
+    var sum = 0
+    var expBase = 1
 
-    digits.forEach { sum += it * base.toDouble().pow(exp++) }
+    digits.forEach {
+        sum += it * expBase
+        expBase *= base
+    }
 
-    return sum.toInt()
+    return sum
 }
 
 /**
@@ -303,10 +308,9 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    val dict = "0123456789abcdefghijklmnopqrstuvwxyz"
-    val digits = mutableListOf<Int>()
-
-    str.forEach { digits += dict.indexOf(it) }
+    val digits = str.map {
+        if (it.isDigit()) it.toString().toInt() else (it - 'a' + 10).toString().toInt()
+    }
 
     return decimal(digits, base)
 }
