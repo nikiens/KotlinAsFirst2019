@@ -242,15 +242,16 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val words = words.map { e -> e.toSet() to words - e }.toSet().toMap()
+    val wrds = words.map { e -> e.toSet() to words - e }.toSet().toMap()
 
-    words.forEach { (k, v) ->
+    wrds.forEach { (k, v) ->
         v.forEach {
             if (canBuildFrom(k.toList(), it)) return true
         }
     }
     return false
 }
+
 /**
  * Сложная
  *
