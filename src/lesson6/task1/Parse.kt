@@ -77,7 +77,7 @@ val months = listOf(
  * входными данными.
  */
 fun dateStrToDigit(str: String): String =
-    Regex("""\b((?!0)\d{1,2})\s([а-я]+)\s((?!0)\d+)\b""").matchEntire(str)
+    Regex("""\b(\d{1,2})\s([а-я]+)\s(\d+)\b""").matchEntire(str)
         ?.destructured
         ?.let { (day, month, year) ->
             val monthNum = months.indexOf(month)
@@ -100,7 +100,7 @@ fun dateStrToDigit(str: String): String =
  * входными данными.
  */
 fun dateDigitToStr(digital: String): String =
-    Regex("""\b((?!00)\d{2})\.((?!00)\d{2})\.((?!0)\d+)\b""").matchEntire(digital)
+    Regex("""\b((?!00)\d{2})\.((?!00)\d{2})\.(\d+)\b""").matchEntire(digital)
         ?.destructured
         ?.let { (day, month, year) ->
             val monthName = months.getOrNull(month.toInt()) ?: return ""
@@ -199,8 +199,7 @@ fun plusMinus(expression: String): Int =
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int =
-    Regex("""\b([а-я]+)\s\1\b""").find(str.toLowerCase())?.range?.first ?: -1
-
+    Regex("""\b([а-яa-z]+)\s\1\b""").find(str.toLowerCase())?.range?.first ?: -1
 
 /**
  * Сложная
@@ -214,7 +213,7 @@ fun firstDuplicateIndex(str: String): Int =
  * Все цены должны быть больше либо равны нуля.
  */
 fun mostExpensive(description: String): String =
-    Regex("""\b(?:(?:.+\s\d+\.?\d*);?\s?)*\b""").matchEntire(description)?.value
+    Regex("""^(?:(?:.+\s\d+\.?\d*);?\s?)*\b""").matchEntire(description)?.value
         ?.split("; ")?.groupBy({ it.split(" ")[0] }, { it.split(" ")[1].toDouble() })
         ?.maxBy { it.value[0] }?.key
         ?: ""
@@ -231,7 +230,7 @@ fun mostExpensive(description: String): String =
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    var num = Regex("""^M{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})$""")
+    var num = Regex("""\bM{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})\b""")
         .matchEntire(roman)?.value ?: return -1
 
     val numeral = mapOf(
@@ -360,5 +359,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
         lim++
     }
 
+    check(pos in 0..res.lastIndex)
     return res
 }
