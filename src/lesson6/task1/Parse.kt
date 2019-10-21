@@ -2,6 +2,9 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+import kotlin.IllegalArgumentException
+
 /**
  * Пример
  *
@@ -57,6 +60,10 @@ fun main() {
     }
 }
 
+val months = listOf(
+    "", "января", "февраля", "марта", "апреля", "мая", "июня",
+    "июля", "августа", "сентября", "октября", "ноября", "декабря"
+)
 
 /**
  * Средняя
@@ -69,7 +76,18 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String =
+    Regex("""\b((?!0)\d{1,2})\s([а-я]+)\s((?!0)\d+)\b""").matchEntire(str)
+        ?.destructured
+        ?.let { (day, month, year) ->
+            val monthNum = months.indexOf(month)
+
+            if (monthNum < 0 || day.toInt() > daysInMonth(monthNum, year.toInt()))
+                return ""
+
+            "%02d.%02d.%s".format(day.toInt(), monthNum, year)
+        }
+        ?: ""
 
 /**
  * Средняя
@@ -81,7 +99,18 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String =
+    Regex("""\b((?!00)\d{2})\.((?!00)\d{2})\.((?!0)\d+)\b""").matchEntire(digital)
+        ?.destructured
+        ?.let { (day, month, year) ->
+            val monthName = months.getOrNull(month.toInt()) ?: return ""
+
+            if (day.toInt() > daysInMonth(month.toInt(), year.toInt()))
+                return ""
+
+            "%d %s %s".format(day.toInt(), monthName, year)
+        }
+        ?: ""
 
 /**
  * Средняя
@@ -97,7 +126,13 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String =
+    Regex("""^(\+\d+)?\s*((?:\(\d+[\d\s\-]*\))?[\s\d-]*)$""").matchEntire(phone)
+        ?.destructured
+        ?.let { (prefix, phone) ->
+            prefix + phone.replace(Regex("""[\s-()]"""), "")
+        }
+        ?: ""
 
 /**
  * Средняя
@@ -109,7 +144,13 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int =
+    Regex("""^[\s\d-%]*$""").matchEntire(jumps)
+        ?.value
+        ?.let { result ->
+            Regex("""\b\d+\b""").findAll(result).map { it.groupValues[0].toInt() }.max()
+        }
+        ?: -1
 
 /**
  * Сложная
@@ -122,7 +163,13 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int =
+    Regex("""^[\s\d-%+]*$""").matchEntire(jumps)
+        ?.value
+        ?.let { result ->
+            Regex("""\b(\d+)\s\+""").findAll(result).map { it.groupValues[1].toInt() }.max()
+        }
+        ?: -1
 
 /**
  * Сложная
@@ -133,7 +180,14 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int =
+    Regex("""^-?\d+(\s[+-]\s\d+)*\1*""").matchEntire(expression)
+        ?.value
+        ?.let { result ->
+            Regex("""^-?\d+\s?|(?:(?:-?|\+)?\s\d+)\s*""").findAll(result)
+                .map { it.groupValues[0].replace(" ", "").toInt() }.sum()
+        }
+        ?: throw IllegalArgumentException()
 
 /**
  * Сложная
@@ -144,7 +198,9 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int =
+    Regex("""\b([а-я]+)\s\1\b""").find(str.toLowerCase())?.range?.first ?: -1
+
 
 /**
  * Сложная
@@ -157,7 +213,11 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String =
+    Regex("""\b(?:(?:.+\s\d+\.?\d*);?\s?)*\b""").matchEntire(description)?.value
+        ?.split("; ")?.groupBy({ it.split(" ")[0] }, { it.split(" ")[1].toDouble() })
+        ?.maxBy { it.value[0] }?.key
+        ?: ""
 
 /**
  * Сложная
@@ -170,7 +230,31 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    var num = Regex("""^M{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})$""")
+        .matchEntire(roman)?.value ?: return -1
+
+    val numeral = mapOf(
+        "M" to 1000, "CM" to 900, "D" to 500, "CD" to 400,
+        "C" to 100, "XC" to 90, "L" to 50, "XL" to 40,
+        "X" to 10, "IX" to 9, "V" to 5, "IV" to 4, "I" to 1
+    )
+
+    var pos = 0
+    var res = 0
+
+    while (num.isNotEmpty()) {
+        val sym = numeral.keys.elementAt(pos)
+
+        if (num.startsWith(sym)) {
+            res += numeral.getValue(sym)
+            num = num.substring(sym.length)
+        } else
+            pos++
+    }
+
+    return res
+}
 
 /**
  * Очень сложная
@@ -208,4 +292,73 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun balancedBrackets(cmds: String): Boolean {
+    var count = 0
+
+    cmds.forEach {
+        when (it) {
+            '[' -> count++
+            ']' -> count--
+        }
+        if (count < 0) return false
+    }
+
+    return count == 0
+}
+
+fun getCloseBracketStep(cmds: String, step: Int): Int {
+    var count = 0
+
+    for (i in step..cmds.lastIndex) {
+        when (cmds[i]) {
+            '[' -> count++
+            ']' -> count--
+        }
+        if (count == 0) return i
+    }
+    return 0
+}
+
+fun getOpenBracketStep(cmds: String, step: Int): Int {
+    var count = 0
+
+    for (i in step downTo 0) {
+        when (cmds[i]) {
+            ']' -> count++
+            '[' -> count--
+        }
+        if (count == 0) return i
+    }
+    return 0
+}
+
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val cmds = Regex("""^[+\-><\[\]\s]*$""").matchEntire(commands)
+        ?.value ?: throw IllegalArgumentException()
+
+    require(balancedBrackets(cmds))
+
+    val res = MutableList(cells) { 0 }
+    var pos = cells / 2
+
+    var step = 0
+    var lim = 0
+
+    while (lim < limit && step <= cmds.lastIndex) {
+        check(pos in 0..res.lastIndex)
+
+        when (cmds[step]) {
+            '>' -> pos++
+            '<' -> pos--
+            '+' -> res[pos]++
+            '-' -> res[pos]--
+            '[' -> if (res[pos] == 0) step = getCloseBracketStep(cmds, step)
+            ']' -> if (res[pos] != 0) step = getOpenBracketStep(cmds, step)
+            else -> Unit
+        }
+        step++
+        lim++
+    }
+
+    return res
+}
