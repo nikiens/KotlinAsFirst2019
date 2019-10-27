@@ -144,9 +144,8 @@ fun mean(list: List<Double>): Double =
 fun center(list: MutableList<Double>): MutableList<Double> {
     val av = list.average()
 
-    list.forEachIndexed { idx, _ ->
-        list[idx] -= av
-    }
+    for (i in list.indices)
+        list[i] -= av
 
     return list
 }
@@ -216,8 +215,9 @@ fun factorize(n: Int): List<Int> {
         if (number % factor == 0) {
             result += factor
             number /= factor
-        } else
+        } else {
             factor += 1
+        }
 
     result += number
 
