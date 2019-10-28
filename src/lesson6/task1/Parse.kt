@@ -229,29 +229,21 @@ fun mostExpensive(description: String): String =
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    var num = Regex("""\bM{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})\b""")
-        .matchEntire(roman)?.value ?: return -1
+    val num =
+        Regex("""\b(M{0,4})(?:(CM)|(CD)|(D?C{0,3}))(?:(XC)|(XL)|(L?X{0,3}))(?:(IX)|(IV)|(V?I{0,3}))\b""")
+            .matchEntire(roman)?.destructured?.toList() ?: return -1
 
     val numeral = mapOf(
-        "M" to 1000, "CM" to 900, "D" to 500, "CD" to 400,
-        "C" to 100, "XC" to 90, "L" to 50, "XL" to 40,
-        "X" to 10, "IX" to 9, "V" to 5, "IV" to 4, "I" to 1
+        "MMMM" to 4000, "MMM" to 3000, "MM" to 2000, "M" to 1000, "CM" to 900,
+        "DCCC" to 800, "DCC" to 700, "DC" to 600, "D" to 500, "CD" to 400,
+        "CCC" to 300, "CC" to 200, "C" to 100, "XC" to 90, "LXXX" to 80,
+        "LXX" to 70, "LX" to 60, "L" to 50, "XL" to 40, "XXX" to 30,
+        "XX" to 20, "X" to 10, "IX" to 9, "VIII" to 8, "VII" to 7,
+        "VI" to 6, "V" to 5, "IV" to 4, "III" to 3, "II" to 2, "I" to 1,
+        "" to 0
     )
 
-    var pos = 0
-    var res = 0
-
-    while (num.isNotEmpty()) {
-        val sym = numeral.keys.elementAt(pos)
-
-        if (num.startsWith(sym)) {
-            res += numeral.getValue(sym)
-            num = num.substring(sym.length)
-        } else
-            pos++
-    }
-
-    return res
+    return num.map { numeral[it]!! }.sum()
 }
 
 /**
