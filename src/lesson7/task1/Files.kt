@@ -387,7 +387,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
     input.close()
     output =
-        StringBuilder(output.replace(Regex("""[^\r\n]*((\r|\n|\r\n)[^\r\n]*)*""")) { "<p>${it.value}</p>" })
+        StringBuilder(output.replace(Regex("""[^\r\n]+((\r|\n|\r\n)[^\r\n]+)*""")) { "<p>${it.value}</p>" })
             .insert(0, "<html><body>")
             .append("</body></html>")
     File(outputName).writeText(output.toString())
