@@ -120,7 +120,7 @@ fun sibilants(inputName: String, outputName: String) {
  */
 fun centerFile(inputName: String, outputName: String) {
     val text = File(inputName).readLines()
-    val maxLength = text.map { it.trim().length }.max()!!
+    val maxLength = text.map { it.trim().length }.max() ?: 0
 
     File(outputName).bufferedWriter().use { out ->
         text.forEach { str ->
@@ -263,10 +263,9 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    val text = File(inputName).readLines()
-    val max = text.maxBy { it.length }?.length
-
     val regex = Regex("""^(?:([а-яa-zё])(?!.*\1))*$""", IGNORE_CASE)
+    val text = File(inputName).readLines()
+    val max = text.filter { it.matches(regex)}.maxBy { it.length }?.length
 
     File(outputName).writeText(text.filter { it.matches(regex) && it.length == max }.joinToString())
 }
@@ -392,6 +391,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     output.write("</p><p>")
                 } else {
                     input.reset()
+                    output.write("\n")
                 }
 
                 state = State.LOOKUP
