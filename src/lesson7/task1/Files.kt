@@ -318,28 +318,25 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 enum class State {
-    LOOKUP, BOLD, ITALIC, STRIKE, PARA
+    LOOKUP, BOLD, ITALIC, STRIKE
 }
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val input = File(inputName).bufferedReader()
-    val output = File(outputName).bufferedWriter()
+    var output = StringBuilder()
     val stack = Stack<State>()
-    var first = true
 
     fun wrap(state: State, tags: Pair<String, String>) =
         if (stack.peek() != state) {
             stack.push(state)
-            output.write(tags.first)
+            output.append(tags.first)
         } else {
             stack.pop()
-            output.write(tags.second)
+            output.append(tags.second)
         }
 
     var state = State.LOOKUP
     stack.push(state)
-
-    output.write("<html><body><p>")
 
     var intChar = input.read()
 
@@ -355,12 +352,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         input.mark(1)
                         state = State.STRIKE
                     }
-                    '\n' -> {
-                        input.mark(1)
-                        state = State.PARA
-                    }
                     else -> {
-                        output.write(intChar)
+                        output.append(intChar.toChar())
                     }
                 }
             State.ITALIC ->
@@ -384,33 +377,20 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     wrap(state, Pair("<s>", "</s>"))
                 } else {
                     input.reset()
-                    output.write("~")
-                }
-
-                state = State.LOOKUP
-            }
-            State.PARA -> {
-                if (intChar.toChar() == '\n' &&
-                    input.read().toChar() != '\n' &&
-                    !first
-                ) {
-                    input.reset()
-                    output.write("</p><p>")
-                } else {
-                    if (!first) input.reset()
-                    output.write("\n")
+                    output.append("~")
                 }
 
                 state = State.LOOKUP
             }
         }
         intChar = input.read()
-        first = false
     }
-    output.write("</p></body></html>")
-
     input.close()
-    output.close()
+    output =
+        StringBuilder(output.replace(Regex("""[^\r\n]*((\r|\n|\r\n)[^\r\n]*)*""")) { "<p>${it.value}</p>" })
+            .insert(0, "<html><body>")
+            .append("</body></html>")
+    File(outputName).writeText(output.toString())
 }
 
 /**
