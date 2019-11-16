@@ -225,16 +225,18 @@ fun top20Words(inputName: String): Map<String, Int> =
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
     var text = File(inputName).readText()
 
-    val newDict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
-    val regex = Regex("[" + escape(newDict.keys.joinToString("")) + "]", IGNORE_CASE)
+    if (dictionary.isNotEmpty()) {
+        val newDict = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
+        val regex = Regex("[" + escape(newDict.keys.joinToString("")) + "]", IGNORE_CASE)
 
-    text = text.replace(regex) {
-        if (it.value[0].isUpperCase())
-            newDict.getValue(it.value[0].toLowerCase()).capitalize()
-        else
-            newDict.getValue(it.value[0].toLowerCase())
+        text = text.replace(regex) {
+            if (it.value[0].isUpperCase()) {
+                newDict.getValue(it.value[0].toLowerCase()).capitalize()
+            } else {
+                newDict.getValue(it.value[0].toLowerCase())
+            }
+        }
     }
-
     File(outputName).writeText(text)
 }
 
@@ -265,7 +267,7 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     val regex = Regex("""^(?:([а-яa-zё])(?!.*\1))*$""", IGNORE_CASE)
     val text = File(inputName).readLines()
-    val max = text.filter { it.matches(regex)}.maxBy { it.length }?.length
+    val max = text.filter { it.matches(regex) }.maxBy { it.length }?.length
 
     File(outputName).writeText(text.filter { it.matches(regex) && it.length == max }.joinToString())
 }
@@ -387,7 +389,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 state = State.LOOKUP
             }
             State.PARA -> {
-                if (intChar.toChar() == '\n') {
+                if (intChar.toChar() == '\n' && input.read().toChar() != '\n') {
+                    input.reset()
                     output.write("</p><p>")
                 } else {
                     input.reset()
