@@ -325,6 +325,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val input = File(inputName).bufferedReader()
     val output = File(outputName).bufferedWriter()
     val stack = Stack<State>()
+    var first = true
 
     fun wrap(state: State, tags: Pair<String, String>) =
         if (stack.peek() != state) {
@@ -389,7 +390,10 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 state = State.LOOKUP
             }
             State.PARA -> {
-                if (intChar.toChar() == '\n' && input.read().toChar() != '\n') {
+                if (intChar.toChar() == '\n' &&
+                    input.read().toChar() != '\n' &&
+                    !first
+                ) {
                     input.reset()
                     output.write("</p><p>")
                 } else {
@@ -401,6 +405,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
         }
         intChar = input.read()
+        first = false
     }
     output.write("</p></body></html>")
 
