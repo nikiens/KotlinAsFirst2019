@@ -397,7 +397,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     input.reset()
                     output.write("</p><p>")
                 } else {
-                    input.reset()
+                    if (!first) input.reset()
                     output.write("\n")
                 }
 
