@@ -92,14 +92,13 @@ fun correct(c: Char): Char =
         else -> ' '
     }
 
-fun sibilants(inputName: String, outputName: String) {
-    var text = File(inputName).readText()
-
-    text = text.replace(Regex("""([жчшщ])([ыяю])""", IGNORE_CASE)) {
-        it.value[0].toString() + correct(it.value[1])
-    }
-    File(outputName).writeText(text)
-}
+fun sibilants(inputName: String, outputName: String) =
+    File(inputName).readText()
+        .replace(Regex("""([жчшщ])([ыяю])""", IGNORE_CASE)) {
+            it.value[0].toString() + correct(it.value[1])
+        }.let {
+            File(outputName).writeText(it)
+        }
 
 /**
  * Средняя
@@ -267,7 +266,7 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     val regex = Regex("""^(?:([а-яa-zё])(?!.*\1))*$""", IGNORE_CASE)
     val text = File(inputName).readLines()
-    val max = text.filter { it.matches(regex) }.maxBy { it.length }?.length
+    val max = text.filter { it.matches(regex) }.maxBy { it.length }!!.length
 
     File(outputName).writeText(text.filter { it.matches(regex) && it.length == max }.joinToString())
 }
@@ -387,7 +386,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
     input.close()
     output =
-        if (output.toString() != "") {
+        if (output.isNotEmpty()) {
             StringBuilder(output.replace(Regex("""[^\r\n]+((\r|\n|\r\n)[^\r\n]+)*""")) { "<p>${it.value}</p>" })
         } else {
             StringBuilder("<p></p>")
