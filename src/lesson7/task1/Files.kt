@@ -266,7 +266,7 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     val regex = Regex("""^(?:([а-яa-zё])(?!.*\1))*$""", IGNORE_CASE)
     val text = File(inputName).readLines()
-    val max = text.filter { it.matches(regex) }.maxBy { it.length }!!.length
+    val max = text.filter { it.matches(regex) }.maxBy { it.length }?.length
 
     File(outputName).writeText(text.filter { it.matches(regex) && it.length == max }.joinToString())
 }
@@ -386,7 +386,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
     input.close()
     output =
-        if (output.isNotEmpty()) {
+        if (output.toString() != "") {
             StringBuilder(output.replace(Regex("""[^\r\n]+((\r|\n|\r\n)[^\r\n]+)*""")) { "<p>${it.value}</p>" })
         } else {
             StringBuilder("<p></p>")
