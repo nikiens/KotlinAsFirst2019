@@ -2,7 +2,6 @@
 
 package lesson7.task1
 
-
 import java.io.File
 import java.util.*
 import kotlin.text.Regex.Companion.escape
@@ -558,7 +557,7 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
         }
 
         it.write("\n".padStart(maxPad, '-'))
-        it.write("${lhv * rhv}".padStart(maxPad - 1))
+        it.write(result.padStart(maxPad - 1))
     }
 }
 
@@ -583,5 +582,60 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val div = (lhv / rhv).toString()
+    val mod = (lhv % rhv).toString()
+
+    val subtrahends = mutableListOf<String>()
+
+    div.forEach {
+        subtrahends += (it.toString().toInt() * rhv).toString()
+    }
+
+    var minuend = lhv.toString().substring(0, subtrahends[0].length).toInt()
+    var broughtDown = lhv.toString().substring(subtrahends[0].length).map { it.toString() }
+    var firstln = " $lhv | $rhv\n"
+    var redudant = 0
+
+    if (minuend < subtrahends[0].toInt()) {
+        minuend = (minuend.toString() + broughtDown[0]).toInt()
+        broughtDown = broughtDown.drop(1)
+        firstln = firstln.trimStart()
+        redudant -= 1
+    }
+
+    File(outputName).bufferedWriter().use {
+        it.write(firstln)
+        it.write("-${subtrahends[0]}")
+        it.write(
+            div.padStart(
+                lhv.toString().length - subtrahends[0].length + div.length + 3 + redudant
+            )
+        )
+        it.newLine()
+        it.write("".padStart(subtrahends[0].length + 1, '-'))
+        it.newLine()
+
+        var pad = minuend.toString().length + 2 + redudant
+
+        if (div.length > 1) {
+            for (i in broughtDown.indices) {
+                val diff = (minuend - subtrahends[i].toInt()).toString()
+                val newMinuend = diff + broughtDown[i]
+
+                it.write(newMinuend.padStart(pad))
+                it.newLine()
+                it.write("-${subtrahends[i + 1]}".padStart(pad))
+                it.newLine()
+                it.write(
+                    "".padStart(subtrahends[i + 1].length + 1, '-')
+                        .padStart(pad)
+                )
+                it.newLine()
+
+                minuend = newMinuend.toInt()
+                pad += newMinuend.length % subtrahends[i + 1].length + 1
+            }
+        }
+        it.write(mod.padStart(pad - 1))
+    }
 }
