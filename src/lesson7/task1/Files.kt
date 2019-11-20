@@ -594,13 +594,18 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var minuend = lhv.toString().substring(0, subtrahends[0].length).toInt()
     var broughtDown = lhv.toString().substring(subtrahends[0].length).map { it.toString() }
     var firstln = " $lhv | $rhv\n"
-    var redudant = 0
+    var redundant = 0
 
     if (minuend < subtrahends[0].toInt()) {
         minuend = (minuend.toString() + broughtDown[0]).toInt()
         broughtDown = broughtDown.drop(1)
         firstln = firstln.trimStart()
-        redudant += 1
+        redundant += 1
+    }
+
+    if (div == "0" && lhv.toString().length > div.length) {
+        firstln = firstln.trimStart()
+        redundant += 1
     }
 
     File(outputName).bufferedWriter().use {
@@ -608,16 +613,17 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         it.write("-${subtrahends[0]}")
         it.write(
             div.padStart(
-                lhv.toString().length - subtrahends[0].length + div.length + 3 - redudant
+                lhv.toString().length - subtrahends[0].length + div.length + 3 - redundant
             )
         )
         it.newLine()
-        it.write("".padStart(subtrahends[0].length + 1, '-'))
-        it.newLine()
 
-        var pad = minuend.toString().length + 2 - redudant
+        var pad = minuend.toString().length + 2 - redundant
 
         if (div.length > 1) {
+            it.write("".padStart(subtrahends[0].length + 1, '-'))
+            it.newLine()
+
             for (i in broughtDown.indices) {
                 val diff = (minuend - subtrahends[i].toInt()).toString()
                 val newMinuend = diff + broughtDown[i]
@@ -638,12 +644,12 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 minuend = newMinuend.toInt()
                 pad += newMinuend.length % subtrahends[i + 1].length + 1
             }
-            it.write(
-                "".padStart(max(subtrahends.last().length + 1, mod.length), '-')
-                    .padStart(pad - 1)
-            )
-            it.newLine()
         }
+        it.write(
+            "".padStart(max(subtrahends.last().length + 1, mod.length), '-')
+                .padStart(pad - 1)
+        )
+        it.newLine()
         it.write(mod.padStart(pad - 1))
     }
 }
