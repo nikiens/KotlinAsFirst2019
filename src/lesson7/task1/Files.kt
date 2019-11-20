@@ -386,7 +386,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
     input.close()
     output =
-        if (output.toString() != "") {
+        if (!output.matches(Regex("""^(\n*\s*)*$"""))) {
             StringBuilder(output.replace(Regex("""[^\r\n]+((\r|\n|\r\n)[^\r\n]+)*""")) { "<p>${it.value}</p>" })
         } else {
             StringBuilder("<p></p>")
@@ -586,6 +586,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val div = (lhv / rhv).toString()
     val mod = (lhv % rhv).toString()
     val subtrahends = mutableListOf<String>()
+    val lastPad = lhv.toString().length + 1
 
     div.forEach {
         subtrahends += (it.toString().toInt() * rhv).toString()
@@ -647,9 +648,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
         it.write(
             "".padStart(max(subtrahends.last().length + 1, mod.length), '-')
-                .padStart(pad - 1)
+                .padStart(lastPad - redundant)
         )
         it.newLine()
-        it.write(mod.padStart(pad - 1))
+        it.write(mod.padStart(lastPad - redundant))
     }
 }
