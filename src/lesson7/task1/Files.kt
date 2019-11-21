@@ -123,7 +123,7 @@ fun centerFile(inputName: String, outputName: String) {
 
     File(outputName).bufferedWriter().use { out ->
         text.forEach { str ->
-            repeat((maxLength - str.trim().length) / 2) { out.write(" ") }
+            out.write(" ".repeat((maxLength - str.trim().length) / 2))
             out.write(str.trim())
             out.newLine()
         }
@@ -638,7 +638,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
                 if (i != broughtDown.lastIndex) {
                     it.write(
-                        "".padStart(subtrahends[i + 1].length + 1, '-')
+                        "".padStart(max(subtrahends[i + 1].length + 1, newMinuend.length), '-')
                             .padStart(pad)
                     )
                     it.newLine()
