@@ -596,6 +596,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var broughtDown = lhv.toString().substring(subtrahends[0].length).map { it.toString() }
     var firstln = " $lhv | $rhv\n"
     var redundant = 0
+    var subtrahendPad = 0
 
     if (minuend < subtrahends[0].toInt()) {
         minuend = (minuend.toString() + broughtDown[0]).toInt()
@@ -607,16 +608,17 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     if (div == "0" && lhv.toString().length > div.length) {
         firstln = firstln.trimStart()
         redundant += 1
+        subtrahendPad += lhv.toString().length
     }
 
     File(outputName).bufferedWriter().use {
         it.write(firstln)
-        it.write("-${subtrahends[0]}")
         it.write(
-            div.padStart(
-                lhv.toString().length - subtrahends[0].length + div.length + 3 - redundant
-            )
+            "-${subtrahends[0]}"
+                .padStart(subtrahendPad)
+                .padEnd(firstln.length - rhv.toString().length - 1)
         )
+        it.write(div)
         it.newLine()
 
         var pad = minuend.toString().length + 2 - redundant
