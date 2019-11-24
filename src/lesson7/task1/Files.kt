@@ -636,9 +636,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 it.write("-${subtrahends[i + 1]}".padStart(pad))
                 it.newLine()
 
-                if ("-${subtrahends[i + 1]}".length == newMinuend.length)
-                    redundant += 1
-
                 if (i != broughtDown.lastIndex) {
                     it.write(
                         "".padStart(max(subtrahends[i + 1].length + 1, newMinuend.length), '-')
@@ -648,8 +645,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 }
 
                 minuend = newMinuend.toInt()
-                pad += newMinuend.length % subtrahends[i + 1].length + 1 - redundant
-                redundant = 0
+                pad += newMinuend.length % subtrahends[i + 1].length + 1
             }
         }
         it.write(
