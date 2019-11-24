@@ -160,7 +160,7 @@ class Line private constructor(val b: Double, val angle: Double) {
 
         val x = (b2 - b1) / (tan(angle) - tan(other.angle))
         val y =
-            if (other.angle in 0.0..PI / 2) {
+            if (other.angle >= 0.0 && other.angle < PI / 2) {
                 x * tan(other.angle) + b2
             } else {
                 x * tan(angle) + b1
@@ -247,7 +247,7 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
  */
 fun circleByThreePoints(a: Point, b: Point, c: Point): Circle =
     bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c)).let {
-        Circle(it, it.distance(a))
+        Circle(it, minOf(it.distance(a), it.distance(b), it.distance(c)))
     }
 
 /**
