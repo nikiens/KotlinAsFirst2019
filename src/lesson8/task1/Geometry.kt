@@ -114,7 +114,7 @@ fun diameter(vararg points: Point): Segment {
 
     val auxiliary = points.maxBy { Point(0.0, 0.0).distance(it) }!!
     val first = points.maxBy { auxiliary.distance(it) }!!
-    val second = points.maxBy { first.distance(it) }!!
+    val second = points.filterNot { it == first }.maxBy { first.distance(it) }!!
 
     return Segment(first, second)
 }
@@ -181,7 +181,7 @@ class Line private constructor(val b: Double, val angle: Double) {
 fun removePeriod(rad: Double): Double {
     var angle = rad
 
-    while (angle !in 0.0..PI - 1e-5)
+    while (angle < 0.0 || angle >= PI)
         if (angle >= PI) angle -= PI else angle += PI
 
     return angle
