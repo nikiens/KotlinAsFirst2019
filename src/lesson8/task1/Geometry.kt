@@ -112,9 +112,11 @@ data class Segment(val begin: Point, val end: Point) {
 fun diameter(vararg points: Point): Segment {
     require(points.size >= 2)
 
-    val auxiliary = points.maxBy { Point(0.0, 0.0).distance(it) }!!
-    val first = points.maxBy { auxiliary.distance(it) }!!
-    val second = points.filterNot { it == first }.maxBy { first.distance(it) }!!
+    val first = points.groupBy({ it }, { (points.toList() - it).toSet() })
+        .map { it.key to it.value[0].map { point -> point.distance(it.key) }.max() }
+        .toMap().maxBy { it.value!! }!!.key
+
+    val second = points.maxBy { first.distance(it) }!!
 
     return Segment(first, second)
 }
@@ -244,7 +246,7 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
  * построить окружность, описанную вокруг треугольника - эквивалентная задача).
  */
 fun circleByThreePoints(a: Point, b: Point, c: Point): Circle =
-    bisectorByPoints(a, b).crossPoint(bisectorByPoints(b, c)).let {
+    bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c)).let {
         Circle(it, it.distance(a))
     }
 
