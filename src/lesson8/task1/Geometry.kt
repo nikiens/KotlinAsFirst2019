@@ -76,10 +76,10 @@ data class Circle(val center: Point, val radius: Double) {
      * расстояние между их центрами минус сумма их радиусов.
      * Расстояние между пересекающимися окружностями считать равным 0.0.
      */
-    fun distance(other: Circle): Double {
-        val d = center.distance(other.center) - (radius + other.radius)
-        return if (d >= 0) d else 0.0
-    }
+    fun distance(other: Circle): Double =
+        (center.distance(other.center) - (radius + other.radius)).let {
+            if (it >= 0) it else 0.0
+        }
 
     /**
      * Тривиальная
@@ -118,13 +118,14 @@ data class Segment(val begin: Point, val end: Point) {
 fun diameter(vararg points: Point): Segment {
     require(points.size >= 2)
 
-    val first = points.groupBy({ it }, { (points.toList() - it).toSet() })
-        .map { it.key to it.value[0].map { point -> point.distance(it.key) }.max() }
-        .toMap().maxBy { it.value!! }!!.key
+    val found = points.groupBy({ it }, { (points.toList() - it).toSet() })
+        .map { entry ->
+            entry.key to entry.value[0].map { point ->
+                point to point.distance(entry.key)
+            }.maxBy { it.second }
+        }.toMap().maxBy { it.value!!.second }!!
 
-    val second = points.maxBy { first.distance(it) }!!
-
-    return Segment(first, second)
+    return Segment(found.key, found.value!!.first)
 }
 
 /**
@@ -166,10 +167,10 @@ class Line private constructor(val b: Double, val angle: Double) {
 
         val x = (b2 - b1) / (tan(angle) - tan(other.angle))
         val y =
-            if (other.angle >= 0.0 && other.angle < PI) {
-                x * tan(other.angle) + b2
-            } else {
+            if (angle != PI / 2) {
                 x * tan(angle) + b1
+            } else {
+                x * tan(other.angle) + b2
             }
 
         return Point(x, y)
@@ -207,16 +208,13 @@ fun lineBySegment(s: Segment): Line = lineByPoints(s.begin, s.end)
  *
  * Построить прямую по двум точкам
  */
-fun lineByPoints(a: Point, b: Point): Line {
-    val k = Point(0.0, a.y).distance(Point(0.0, b.y)) / Point(a.x, 0.0).distance(
-        Point(
-            b.x,
-            0.0
-        )
-    ) * sign((b.y - a.y) / (b.x - a.x))
-
-    return Line(a, removePeriod(atan(k)))
-}
+fun lineByPoints(a: Point, b: Point): Line =
+    (Point(0.0, a.y)
+        .distance(Point(0.0, b.y)) / Point(a.x, 0.0)
+        .distance(Point(b.x, 0.0)) * sign((b.y - a.y) / (b.x - a.x)))
+        .let {
+            Line(a, removePeriod(atan(it)))
+        }
 
 /**
  * Сложная
@@ -235,12 +233,14 @@ fun bisectorByPoints(a: Point, b: Point): Line =
 fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
     require(circles.size >= 2)
 
-    val first = circles.groupBy({ it }, { (circles.toList() - it).toSet() })
-        .map { it.key to it.value[0].map { circle -> circle.distance(it.key) }.min() }
-        .toMap().minBy { it.value!! }!!.key
+    val found = circles.groupBy({ it }, { (circles.toList() - it).toSet() })
+        .map { entry ->
+            entry.key to entry.value[0].map { circle ->
+                circle to circle.distance(entry.key)
+            }.minBy { it.second }
+        }.toMap().minBy { it.value!!.second }!!
 
-    val second = circles.filterNot { it == first }.minBy { first.distance(it) }!!
-    return Pair(first, second)
+    return Pair(found.key, found.value!!.first)
 }
 
 /**
