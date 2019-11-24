@@ -588,15 +588,17 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val subtrahends = mutableListOf<String>()
     val lastPad = lhv.toString().length + 1
 
+    var firstln = " $lhv | $rhv\n"
+    var redundant = 0
+    var loopRedundant = 0
+    var subtrahendPad = 0
+
     div.forEach {
         subtrahends += (it.toString().toInt() * rhv).toString()
     }
 
     var minuend = lhv.toString().substring(0, subtrahends[0].length).toInt()
     var broughtDown = lhv.toString().substring(subtrahends[0].length).map { it.toString() }
-    var firstln = " $lhv | $rhv\n"
-    var redundant = 0
-    var subtrahendPad = 0
 
     if (minuend < subtrahends[0].toInt()) {
         minuend = (minuend.toString() + broughtDown[0]).toInt()
@@ -636,6 +638,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 it.write("-${subtrahends[i + 1]}".padStart(pad))
                 it.newLine()
 
+                if ("-${subtrahends[i + 1]}".length == newMinuend.toInt().toString().length)
+                    loopRedundant += 1
+
                 if (i != broughtDown.lastIndex) {
                     it.write(
                         "".padStart(max(subtrahends[i + 1].length + 1, newMinuend.length), '-')
@@ -645,7 +650,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 }
 
                 minuend = newMinuend.toInt()
-                pad += newMinuend.length % subtrahends[i + 1].length + 1
+                pad += newMinuend.length % subtrahends[i + 1].length + 1 - loopRedundant
             }
         }
         it.write(
