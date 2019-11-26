@@ -591,6 +591,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var firstln = " $lhv | $rhv\n"
     var redundant = 0
     var subtrahendPad = 0
+    var padRedundant: Int
 
     div.forEach {
         subtrahends += (it.toString().toInt() * rhv).toString()
@@ -637,6 +638,13 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 it.write("-${subtrahends[i + 1]}".padStart(pad))
                 it.newLine()
 
+                padRedundant =
+                    if (newMinuend.length == "-${subtrahends[i + 1]}".length && subtrahends[i + 1] != "0") {
+                        1
+                    } else {
+                        0
+                    }
+
                 if (i != broughtDown.lastIndex) {
                     it.write(
                         "".padStart(max(subtrahends[i + 1].length + 1, newMinuend.length), '-')
@@ -646,7 +654,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 }
 
                 minuend = newMinuend.toInt()
-                pad += newMinuend.length % subtrahends[i + 1].length + 1
+                pad += newMinuend.length % subtrahends[i + 1].length + 1 - padRedundant
             }
         }
         it.write(
