@@ -639,7 +639,10 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 it.newLine()
 
                 padRedundant =
-                    if (newMinuend.length == "-${subtrahends[i + 1]}".length && subtrahends[i + 1] != "0") {
+                    if (newMinuend.length == "-${subtrahends[i + 1]}".length &&
+                        subtrahends[i + 1] != "0" &&
+                        newMinuend[0] != '0'
+                    ) {
                         1
                     } else {
                         0
