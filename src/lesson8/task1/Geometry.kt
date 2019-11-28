@@ -280,16 +280,16 @@ fun circleByThreePoints(a: Point, b: Point, c: Point): Circle =
 fun minContainingCircle(vararg points: Point): Circle {
     require(points.isNotEmpty())
 
+    if (points.size == 1) {
+        return Circle(points[0], 0.0)
+    }
+
     val p = points.toSet().shuffled()
     var c = circleByDiameter(Segment(p[0], p[1]))
 
-    if (points.size == 1) {
-        return Circle(points[0], 0.0)
-    } else {
-        for (i in 2..p.lastIndex) {
-            if (!c.contains(p[i])) {
-                c = minCircleWithPoint(p.take(i), p[i])
-            }
+    for (i in 2..p.lastIndex) {
+        if (!c.contains(p[i])) {
+            c = minCircleWithPoint(p.take(i), p[i])
         }
     }
 
