@@ -112,8 +112,9 @@ data class Segment(val begin: Point, val end: Point) {
 
 /**
  * Основные части функций diameter и findNearestCirclePair выполняют схожие роли.
- * Возможно, имеет смысл выделить эту часть в отдельную функцию, находящую близжайшие и
- * удаленные окружности, а точки в таком случае считать за окружности с нулевым радиусом
+ * Возможно, имеет смысл выделить эту часть в отдельную функцию, если возможно передать
+ * minBy или maxBy в аргументы, находящую близжайшие и удаленные окружности, а
+ * точки в таком случае считать за окружности с нулевым радиусом
  */
 fun diameter(vararg points: Point): Segment {
     require(points.size >= 2)
@@ -253,7 +254,7 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
  */
 fun circleByThreePoints(a: Point, b: Point, c: Point): Circle =
     bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c)).let {
-        Circle(it, minOf(it.distance(a), it.distance(b), it.distance(c)))
+        Circle(it, it.distance(b))
     }
 
 /**
@@ -267,6 +268,56 @@ fun circleByThreePoints(a: Point, b: Point, c: Point): Circle =
  * три точки данного множества, либо иметь своим диаметром отрезок,
  * соединяющий две самые удалённые точки в данном множестве.
  */
+
+/**
+ * Реализовал этот алгоритм:
+ * http://algolist.manual.ru/maths/geom/misc/mincircle.php
+ * https://neerc.ifmo.ru/wiki/index.php?title=Минимальная_охватывающая_окружность_множества_точек
+ *
+ * Наивную реализацию мне так и не удалось довести до конца.
+ */
+
 fun minContainingCircle(vararg points: Point): Circle {
-    TODO()
+    require(points.isNotEmpty())
+
+    val p = points.toSet().shuffled()
+    var c = circleByDiameter(Segment(p[0], p[1]))
+
+    if (points.size == 1) {
+        return Circle(points[0], 0.0)
+    } else {
+        for (i in 2..p.lastIndex) {
+            if (!c.contains(p[i])) {
+                c = minCircleWithPoint(p.take(i), p[i])
+            }
+        }
+    }
+
+    return c
+}
+
+fun minCircleWithPoint(points: List<Point>, point: Point): Circle {
+    val p = points.shuffled()
+    var c = circleByDiameter(Segment(p[0], point))
+
+    for (i in 1..p.lastIndex) {
+        if (!c.contains(p[i])) {
+            c = minCircleWithTwoPoints(p.take(i), p[i], point)
+        }
+    }
+
+    return c
+}
+
+fun minCircleWithTwoPoints(points: List<Point>, point1: Point, point2: Point): Circle {
+    val p = points.shuffled()
+    var c = circleByDiameter(Segment(point1, point2))
+
+    p.forEach {
+        if (!c.contains(it)) {
+            c = circleByThreePoints(it, point1, point2)
+        }
+    }
+
+    return c
 }
