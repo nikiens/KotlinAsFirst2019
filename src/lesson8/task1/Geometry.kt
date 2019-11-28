@@ -165,13 +165,23 @@ class Line private constructor(val b: Double, val angle: Double) {
         val b1 = b / cos(angle)
         val b2 = other.b / cos(other.angle)
 
-        val x = (b2 - b1) / (tan(angle) - tan(other.angle))
-        val y =
-            if (angle != PI / 2) {
-                x * tan(angle) + b1
-            } else {
-                x * tan(other.angle) + b2
+        val x: Double
+        val y: Double
+
+        when {
+            angle == PI / 2 && other.angle != PI / 2 -> {
+                x = -b / sin(angle)
+                y = x * tan(other.angle) + b2
             }
+            angle != PI / 2 && other.angle == PI / 2 -> {
+                x = -other.b / sin(other.angle)
+                y = x * tan(angle) + b1
+            }
+            else -> {
+                x = (b2 - b1) / (tan(angle) - tan(other.angle))
+                y = x * tan(angle) + b1
+            }
+        }
 
         return Point(x, y)
     }
