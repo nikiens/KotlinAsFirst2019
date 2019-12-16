@@ -289,11 +289,12 @@ fun minContainingCircle(vararg points: Point): Circle {
         return Circle(points[0], 0.0)
     }
 
-    var c = circleByDiameter(Segment(points[0], points[1]))
+    val p = points.toSet().toList()
+    var c = circleByDiameter(Segment(p[0], p[1]))
 
-    for (i in 2..points.lastIndex) {
-        if (!c.contains(points[i])) {
-            c = minCircleWithPoint(points.take(i), points[i])
+    for (i in 2..p.lastIndex) {
+        if (!c.contains(p[i])) {
+            c = minCircleWithPoint(p.take(i), p[i])
         }
     }
 
