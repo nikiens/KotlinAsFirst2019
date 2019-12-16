@@ -219,12 +219,7 @@ fun lineBySegment(s: Segment): Line = lineByPoints(s.begin, s.end)
  * Построить прямую по двум точкам
  */
 fun lineByPoints(a: Point, b: Point): Line =
-    (Point(0.0, a.y)
-        .distance(Point(0.0, b.y)) / Point(a.x, 0.0)
-        .distance(Point(b.x, 0.0)) * sign((b.y - a.y) / (b.x - a.x)))
-        .let {
-            Line(a, removePeriod(atan(it)))
-        }
+    Line(a, removePeriod(atan2(b.y - a.y, b.x - a.x)))
 
 /**
  * Сложная
@@ -294,12 +289,11 @@ fun minContainingCircle(vararg points: Point): Circle {
         return Circle(points[0], 0.0)
     }
 
-    val p = points.toSet().shuffled()
-    var c = circleByDiameter(Segment(p[0], p[1]))
+    var c = circleByDiameter(Segment(points[0], points[1]))
 
-    for (i in 2..p.lastIndex) {
-        if (!c.contains(p[i])) {
-            c = minCircleWithPoint(p.take(i), p[i])
+    for (i in 2..points.lastIndex) {
+        if (!c.contains(points[i])) {
+            c = minCircleWithPoint(points.take(i), points[i])
         }
     }
 
@@ -307,12 +301,11 @@ fun minContainingCircle(vararg points: Point): Circle {
 }
 
 fun minCircleWithPoint(points: List<Point>, point: Point): Circle {
-    val p = points.shuffled()
-    var c = circleByDiameter(Segment(p[0], point))
+    var c = circleByDiameter(Segment(points[0], point))
 
-    for (i in 1..p.lastIndex) {
-        if (!c.contains(p[i])) {
-            c = minCircleWithTwoPoints(p.take(i), p[i], point)
+    for (i in 1..points.lastIndex) {
+        if (!c.contains(points[i])) {
+            c = minCircleWithTwoPoints(points.take(i), points[i], point)
         }
     }
 
@@ -320,10 +313,9 @@ fun minCircleWithPoint(points: List<Point>, point: Point): Circle {
 }
 
 fun minCircleWithTwoPoints(points: List<Point>, point1: Point, point2: Point): Circle {
-    val p = points.shuffled()
     var c = circleByDiameter(Segment(point1, point2))
 
-    p.forEach {
+    points.forEach {
         if (!c.contains(it)) {
             c = circleByThreePoints(it, point1, point2)
         }
