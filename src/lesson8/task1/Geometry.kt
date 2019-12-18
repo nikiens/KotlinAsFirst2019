@@ -219,7 +219,7 @@ fun lineBySegment(s: Segment): Line = lineByPoints(s.begin, s.end)
  * Построить прямую по двум точкам
  */
 fun lineByPoints(a: Point, b: Point): Line =
-    Line(a, removePeriod(PI + atan2(a.y - b.y, a.x - b.x)))
+    Line(a, removePeriod(PI + atan2(b.y - a.y, b.x - a.x)))
 
 /**
  * Сложная
